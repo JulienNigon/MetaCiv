@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import civilisation.Configuration;
+import civilisation.GroupAndRole;
 import civilisation.individu.Humain;
 
 public abstract class Action {
@@ -75,13 +76,12 @@ public abstract class Action {
 		return null;
 	}
 
+	/**
+	 * Use an array of string and convert it into options for the action.
+	 * @param options : array of string
+	 */
 	public void parametrer(String[] options){
-		
-		for (int i = 0 ; i < options.length; i++) {
-			System.out.println("OPT : " + options[i]);
-			
-		}
-		
+
 		for (int i = 1; i < options.length; i++){ /*Le premier terme est le nom de l'action, on l'ignore donc*/
 			//System.out.println("Chargement d'une action");
 			OptionsActions option = new OptionsActions(options[i].split("\\(")[0]);
@@ -113,6 +113,12 @@ public abstract class Action {
 					}
 					if (param[j].split(" ")[0].equals("Cogniton")){
 						option.addParametre(Configuration.getCognitonByName(param[j].split(" ")[1]));
+					}
+					if (param[j].split(" ")[0].equals("Group")){
+						option.addParametre(Configuration.getGroupModelByName(param[j].split(" ")[1]));
+					}
+					if (param[j].split(" ")[0].equals("GroupAndRole")){
+						option.addParametre(new GroupAndRole(param[j].split(" ")[1]));
 					}
 					if (param[j].split(" ")[0].equals("Comparator")){
 						option.addParametre(Comparator.toComparator(param[j].split(" ")[1]));
@@ -215,7 +221,6 @@ public abstract class Action {
 	public void addActionBefore(Action action , Action ref) {
 		for (int i = 0 ; i < listeActions.size(); i++){
 			if (listeActions.get(i).equals(ref)){
-				System.out.println("Action ajoutŽe : " + (i+1));
 				listeActions.add(i,action);
 				if (i>0){
 					listeActions.get(i-1).setNextAction(action);
@@ -232,7 +237,6 @@ public abstract class Action {
 	public void addSubAction(Action action, Action ref) {
 		for (int i = 0 ; i < listeActions.size(); i++){
 			if (listeActions.get(i).equals(ref)){
-				System.out.println("Action ajoutŽe : " + (i+1));
 				listeActions.get(i).getListeActions().add(0,action);
 				if (listeActions.get(i).getListeActions().size()>1){
 					action.setNextAction(listeActions.get(i).getListeActions().get(1));

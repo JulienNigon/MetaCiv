@@ -1,0 +1,12 @@
+<Terrain>
+	<Name>Plaine</Name>
+	<Passabilite>10</Passabilite>
+	<Infranchissable>false</Infranchissable>
+	<Pheromones>
+	</Pheromones>
+	<Couleur>
+		<R>51</R>
+		<G>204</G>
+		<B>0</B>
+	</Couleur>
+</Terrain>

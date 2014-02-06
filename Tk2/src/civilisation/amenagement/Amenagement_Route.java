@@ -27,6 +27,11 @@ public class Amenagement_Route extends AmenagementPublic {
 
 	}
 	
+	public void Utiliser()
+	{
+		
+	}
+	
 	@Override
 	public String getNom()
 	{

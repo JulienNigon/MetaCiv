@@ -1,0 +1,12 @@
+<Terrain>
+	<Name>Mer profonde</Name>
+	<Passabilite>35</Passabilite>
+	<Infranchissable>false</Infranchissable>
+	<Pheromones>
+	</Pheromones>
+	<Couleur>
+		<R>0</R>
+		<G>0</G>
+		<B>204</B>
+	</Couleur>
+</Terrain>

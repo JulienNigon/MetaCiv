@@ -19,13 +19,13 @@
 package civilisation.individu;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import utils.Utils;
-
 import civilisation.Civilisation;
 import civilisation.Communaute;
 import civilisation.Configuration;
@@ -34,12 +34,10 @@ import civilisation.amenagement.Amenagement_Route;
 import civilisation.individu.cognitons.NCogniton;
 import civilisation.inventaire.NInventaire;
 import civilisation.inventaire.Objet;
-import civilisation.marks.ExplosionCombat;
 import civilisation.pathfinder.Noeud;
 import civilisation.urbanisme.Batiment;
 import civilisation.urbanisme.Batiment_Hutte;
 import civilisation.world.World;
-
 import edu.turtlekit2.kernel.agents.Turtle;
 import edu.turtlekit2.kernel.environment.Patch;
 
@@ -61,33 +59,27 @@ public class Humain extends Turtle
 	ArrayList<Amenagement> amenagements;
 	NInventaire inventaire;
 	int vie;
-	int gestation; // Si l'agent porte un enfant : -1 indique non, sinon indique le temps restant avant enfantement
+	int gestation;
 	int influence;
-	Boolean femme; //false=homme true=femme (Pr√É¬©sent pour une √É¬©ventuelle utilisation future)
-	public String couleurDePeau;
+	Boolean femme;
 	Humain pere;
 	Humain mere;
 	Humain conjoint;
 	ArrayList<Humain> enfants;
 	HashMap<String,Integer> attributes;
 
-	Boolean isSelected = false;
+	/* For map drawing */
+	public boolean isSelected = false;
+	public boolean isShowGroup = false;
 	
-	Esprit esprit; //Contient les "pens≈Ωes" de l'agent
+	Esprit esprit; //The "mind" of the agent.
 	
-	/*variables pour la gestion des actions*/
 	String projet; //M≈Ωmorise le projet que souhaite accomplir l'agent
 	Boolean commit; //Indique si ce projet engage l'agent (il ne l'abandonne pas aprÔøΩs avoir effectu≈Ω un r≈Ωflexe par exemple)
 	int timer; //Si le projet de l'agent a une dur≈Ωe maximum dans le temps : -1 indique que non
 	
-	ArrayList<Patch> chemin;
+	private ArrayList<Patch> chemin;
 	int tempsPatch;
-    public static int poidsActionDiscuter_EtreDansLaMemeCiv = 25;
-    public static int poidsActionDiscuter_EtreTimide = 25;
-    public static int poidsActionDiscuter_EtreExtraverti = 25;
-    public static int gainFoiActionPrier = 4;
-
-	
 
 	public Humain(Civilisation civ , Communaute communaute)
 	{
@@ -116,14 +108,14 @@ public class Humain extends Turtle
 	public void die()
 	{
 		
-		System.out.println("------------------------------------------------");
+		//System.out.println("------------------------------------------------");
 		System.out.println("Un agent est mort au cours du projet : " + this.getEsprit().getPlanEnCours());
-		System.out.println("Vie : " + this.getVie());
-		if(this.chemin != null) System.out.println("Chemin : " + this.chemin);
-		System.out.println("Inventaire" + this.inventaire);
+		//System.out.println("Vie : " + this.getVie());
+		//if(this.chemin != null) System.out.println("Chemin : " + this.chemin);
+		//System.out.println("Inventaire" + this.inventaire);
 		
 		//Utils.afficherTrace();
-		System.out.println("-------------------******-----------------------");
+		//System.out.println("-------------------******-----------------------");
 		
 		//this.getEsprit().clearAllCognitons();   /*TODO*/
 		super.die();
@@ -201,26 +193,14 @@ public class Humain extends Turtle
 	 */
 	private void naissance() {
 		Humain h = new Humain(civ, communaute, conjoint, this);
-		
-		//héritage par this
-		if(Math.random() < 0.5)
-		{
-			h.couleurDePeau = couleurDePeau;
-		}
-		//héritage du conjoint
-		else
-		{
-			h.couleurDePeau = conjoint.couleurDePeau;
-		}		
+
+		//TODO
 		
 		createTurtle(h);
 		gestation = -1;
 		enfants.add(h);
 		conjoint.getEnfants().add(h);
 	}
-
-
-
 
 	@Override
 	public void setup()
@@ -230,14 +210,6 @@ public class Humain extends Turtle
 		playRole("Humain");
 	} 
 
-	/**
-	 * L'agent se d≈Ωplace sans but particulier 
-	 */
-	public void explorer()
-	{
-		move(1);
-	}
-
 /**
  * L'agent rentre chez lui
  */
@@ -245,6 +217,7 @@ public class Humain extends Turtle
 	{
 
 		this.allerVers(this.communaute);
+		
 	}
 	
 	
@@ -264,6 +237,7 @@ public class Humain extends Turtle
 				
 				if(chemin != null && !chemin.isEmpty())
 				{
+					System.out.println("My position : " + this.position + " " + chemin);
 					Patch cible = this.chemin.get(0);
 					this.face(cible);
 				}
@@ -310,17 +284,6 @@ public class Humain extends Turtle
 	
 	
 	/**
-	 * Fait attendre un enfant ÀÜ l'agent
-	 */
-	public void attendreEnfant(Humain conjoint) {
-		if (gestation == -1)
-		{
-			this.conjoint = conjoint;
-			gestation = Configuration.tempsDeGestation;
-		}	
-	}
-	
-	/**
 	 * L'agent avance ou tourne si un obstacle se pr≈Ωsente
 	 */
 	public void move(int i)
@@ -335,6 +298,7 @@ public class Humain extends Turtle
 	@Override
 	public void fd(int i)
 	{
+
 			Color couleur = this.getPatchColor();
 			int TempsAPasser = Configuration.couleurs_terrains.get(couleur).getPassabilite();
 			TempsAPasser /= 10;
@@ -346,7 +310,13 @@ public class Humain extends Turtle
 				if(!Configuration.couleurs_terrains.get(couleur).getInfranchissable())
 				{
 					super.fd(1);
-					emit("passage",1.0);
+					//emit("passage", 1.0);
+					if(this.smell("passage") > Configuration.passagesPourCreerRoute && !this.isMarkPresent("Route"))
+					{
+						Amenagement_Route troncon = new Amenagement_Route(this.position);
+						//this.addAmenagement(troncon);  /*TODO : adapter les amenagements*/
+						this.dropMark("Route", troncon);
+					}		
 					if(!Configuration.couleurs_terrains.get(coul).getInfranchissable())
 					{
 						this.fd(1);
@@ -356,8 +326,14 @@ public class Humain extends Turtle
 				else
 				{
 					this.randomHeading();
-					this.fd(1);
-				
+					super.fd(1);
+					//emit("passage", 1.0);
+					if(this.smell("passage") > Configuration.passagesPourCreerRoute && !this.isMarkPresent("Route"))
+					{
+						Amenagement_Route troncon = new Amenagement_Route(this.position);
+						//this.addAmenagement(troncon);  /*TODO : adapter les amenagements*/
+						this.dropMark("Route", troncon);
+					}						
 				}
 				
 				
@@ -374,6 +350,12 @@ public class Humain extends Turtle
 				{
 					super.fd(1);
 					emit("passage",1.0);
+					if(this.smell("passage") > Configuration.passagesPourCreerRoute && !this.isMarkPresent("Route"))
+					{
+						Amenagement_Route troncon = new Amenagement_Route(this.position);
+						//this.addAmenagement(troncon);  /*TODO : adapter les amenagements*/
+						this.dropMark("Route", troncon);
+					}	
 					
 				}
 				else
@@ -620,7 +602,6 @@ public class Humain extends Turtle
 	
 	
 	/**
-	 * 
 	 * @param role
 	 * @return une tortue presente sur le patch ayant un role donn√Ø¬ø¬Ω
 	 */
@@ -676,12 +657,10 @@ public class Humain extends Turtle
 		}
 		if(!choix.isEmpty())
 		{
-
 			return this.oneOf(choix);
 		}
 		else
 		{		
-
 			return null;
 		}
 		
@@ -916,6 +895,7 @@ public class Humain extends Turtle
 
 	public ArrayList<Patch> AStar(Patch cible)
 	{
+		System.out.println("ASTAR :" + cible + this.position);
 		int[][] map = new int[this.getWorldWidth()][this.getWorldHeight()];
 		int minx = Math.min(cible.x, this.xcor());
 		int maxx = Math.max(cible.x, this.xcor());
@@ -934,16 +914,14 @@ public class Humain extends Turtle
 		{
 			for(int j = 0; j < this.visionRadius * 2 ; j++)
 			{
-						Color couleur = this.getPatchColorAt(i - this.visionRadius, j - this.visionRadius);
+				Color couleur = this.getPatchColorAt(i - this.visionRadius, j - this.visionRadius);
 				
-						int passabilite = Configuration.couleurs_terrains.get(this.getPatchColorAt(i - this.visionRadius, j - this.visionRadius)).getPassabilite();
-						map[this.xcor() + i - this.visionRadius][this.ycor()+j - this.visionRadius] = (int) (passabilite - (passabilite/2*1/this.smellAt("passage", i - this.visionRadius, j - this.visionRadius)));
+				int passabilite = Configuration.couleurs_terrains.get(this.getPatchColorAt(i - this.visionRadius, j - this.visionRadius)).getPassabilite();
+				map[this.xcor() + i - this.visionRadius][this.ycor()+j - this.visionRadius] = (int) (passabilite - (passabilite/2*1/this.smellAt("passage", i - this.visionRadius, j - this.visionRadius)));
 							 
-						
-
 				if(this.isMarkPresentAt("Route", i - this.visionRadius, j - this.visionRadius))
 				{
-					map[this.xcor() + i - this.visionRadius][this.ycor()+j - this.visionRadius] -= 1;
+					map[this.xcor() + i - this.visionRadius][this.ycor()+j - this.visionRadius] /= 10;
 				}
 					
 			}
@@ -1052,6 +1030,7 @@ public class Humain extends Turtle
 			int y = close_list.get(i).getPosY();
 			if(map[x][y] >= Configuration.VitesseEstimeeParDefaut)
 			{
+				System.out.println("ASTARLISTE" + liste);
 				return liste;
 			}
 			else
@@ -1059,9 +1038,10 @@ public class Humain extends Turtle
 				liste.add(0,this.getPatchAt(x - this.position.x, y - this.position.y));
 			}
 		}
-		
+		System.out.println("ASTARLISTE" + liste);
 		return liste;
 	}
+	
 	public boolean doublons(ArrayList<Noeud> liste, Noeud noeud )
 	{
 		for(int i = 0; i < liste.size(); i++)
@@ -1136,17 +1116,6 @@ public class Humain extends Turtle
 	public ArrayList<Patch> AllerVers(Patch cible)
 	{
 		return AStar(cible);	
-	}
-	
-
-
-	
-
-	
-	public void Epouser(Humain fille)
-	{
-		this.conjoint = fille;
-		fille.attendreEnfant(this);
 	}
 	
 
@@ -1439,15 +1408,17 @@ public class Humain extends Turtle
 			            		break;
 					 }	
 				}
-		}
-
-		
-		
-			
-			
+		}		
 	}
 		attributes.put(s, d);
+	}
+	
+	public ArrayList<Patch> getChemin() {
+		return chemin;
+	}
 
+	public void setChemin(ArrayList<Patch> chemin) {
+		this.chemin = chemin;
 	}
 
 

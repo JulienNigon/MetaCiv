@@ -34,7 +34,7 @@ import edu.turtlekit2.kernel.environment.TurtleEnvironment;
 
 
 /** 
- * Repr�sente le monde de jeu
+ * ReprŽsente le monde de jeu
  * @author DTEAM
  * @version 1.0 - 2/2013
 */
@@ -77,15 +77,15 @@ public class World extends TurtleEnvironment
 		return World.instance;
 	}
 	
-	/* D�tourne l'utilisation normale de fillGrid pour r�gler � notre mani�re la taille de l'environnement
+	/* DŽtourne l'utilisation normale de fillGrid pour rŽgler ˆ notre mani�re la taille de l'environnement
 	 * Efficace pour l'instant */
 	@Override
 	public void fillGrid(){
 		
 		if (Configuration.environnementACharger != null){
 			System.out.println("Dimensionnement de l'environnement");
-			x = Integer.parseInt(Initialiseur.getChamp("Largeur", new File(System.getProperty("user.dir")+"/bin/civilisation/ressources/environnements/"+Configuration.environnementACharger+Configuration.getExtension()))[0]);
-	       	y = Integer.parseInt(Initialiseur.getChamp("Hauteur", new File(System.getProperty("user.dir")+"/bin/civilisation/ressources/environnements/"+Configuration.environnementACharger+Configuration.getExtension()))[0]);
+			x = Integer.parseInt(Initialiseur.getChampM("Largeur", new File(System.getProperty("user.dir")+"/bin/civilisation/ressources/environnements/"+Configuration.environnementACharger+Configuration.getExtension())));
+	       	y = Integer.parseInt(Initialiseur.getChampM("Hauteur", new File(System.getProperty("user.dir")+"/bin/civilisation/ressources/environnements/"+Configuration.environnementACharger+Configuration.getExtension())));
 
 		}
 		else{
@@ -141,7 +141,7 @@ public class World extends TurtleEnvironment
 	    	   }
 	       }
 	       
-	       /*Installation des premi�res civilisations*/
+	       /*Installation des premi�res civilisations*/
 	       ArrayList<String[]> listeCivs = Initialiseur.getListeChamp("Civilisation", new File(System.getProperty("user.dir")+"/bin/civilisation/ressources/environnements/"+Configuration.environnementACharger+Configuration.getExtension()));
 	       for (int i = 0; i < listeCivs.size(); i++){
 	    	   
@@ -236,7 +236,14 @@ public class World extends TurtleEnvironment
 	
 	
 	
-	/*---------------Fonctions de g�n�ration du monde---------------------------*/
+	
+	
+	
+	
+	/*NOT USED ANYMORE*/
+	/*---------------Fonctions de gŽnŽration du monde---------------------------*/
+	
+	
 	
 	/**Creer un continent (terrains de type plaine).
 	 */
@@ -268,7 +275,7 @@ public class World extends TurtleEnvironment
 
 	}			
 	
-	/**Une m�thode qui rend les c�tes un peu plus r�alistes
+	/**Une mï¿½thode qui rend les cï¿½tes un peu plus rï¿½alistes
 	 */
 	public void dessinerLesCotes()
 	{
@@ -284,7 +291,7 @@ public class World extends TurtleEnvironment
 		}
 	}
 	
-	/**Une m�thode qui transforme toutes les plaines/d�serts/for�ts sur la c�te en littoral.
+	/**Une mï¿½thode qui transforme toutes les plaines/dï¿½serts/forï¿½ts sur la cï¿½te en littoral.
 	 */
 	public void genererLittoral()
 	{
@@ -300,10 +307,10 @@ public class World extends TurtleEnvironment
 		}
 	}
 
-	/**Creer un desert. Le desert est cr�� au niveau d'une latitude donn�e.
+	/**Creer un desert. Le desert est crï¿½ï¿½ au niveau d'une latitude donnï¿½e.
 	 * Se propage sur les plaines et la foret
 	 */
-	public void genererDesert(int x, int longueur , int largeur , double latitude)  //latitude : �90 (+ --> Nord  / - --> Sud)
+	public void genererDesert(int x, int longueur , int largeur , double latitude)  //latitude : ï¿½90 (+ --> Nord  / - --> Sud)
 	{
 		int nouveauX = x;
 		int nouveauY = (int) ((this.getHeight()/2)*(1+latitude/90));
@@ -365,7 +372,7 @@ public class World extends TurtleEnvironment
 	
 
 
-	/**Creer un massif montagneux, comprenant des montagnes entour�es de collines, entour�es de plaines
+	/**Creer un massif montagneux, comprenant des montagnes entourï¿½es de collines, entourï¿½es de plaines
 	 */
 	public void genererMassifMontagneux(int x , int y , int longueur)
 	{
@@ -431,7 +438,7 @@ public class World extends TurtleEnvironment
 					selection.add(voisins[l]);
 				}
 			}
-			if (selection.size() == 0) return false; //La riviere ne peut plus continuer : On annule et on annonce qu'elle n'a pas �t� construite
+			if (selection.size() == 0) return false; //La riviere ne peut plus continuer : On annule et on annonce qu'elle n'a pas ï¿½tï¿½ construite
 			cible = selection.get((int)(Math.random()*selection.size())); //On selectionne une case au hasard
 			nouveauX = cible.x;
 			nouveauY = cible.y;
@@ -449,25 +456,13 @@ public class World extends TurtleEnvironment
 			{
 				if (voisins[l].getColor() == ColorDeserts)
 				{
-					voisins[l].setColor(ColorPlaines); //Si une rivi�re passe dans le desert, la zone deviens fertile
+					voisins[l].setColor(ColorPlaines); //Si une riviï¿½re passe dans le desert, la zone deviens fertile
 				}
 			}
 		}
 		
 		return true;
 	}
-	
-	/**
-	 * Met en place les attributs des patchs.
-	 * On utilise les ph�romones pour cela.
-	 */
-	private void initialiserRessources()
-	{
-
-	  
-	}
-	
-	
 	
 	/**Verifie qu'un point se situe dans les limites de la carte.
 	 * Retourne vrai si le point est inclu, faux sinon.
@@ -503,7 +498,7 @@ public class World extends TurtleEnvironment
 		return resultat;
 	}
 	
-	/**Transforme une coordonn�e x pour qu'elle corresponde au tore
+	/**Transforme une coordonnï¿½e x pour qu'elle corresponde au tore
 	 */
 	private int effetToreX(int x)
 	{
@@ -516,7 +511,7 @@ public class World extends TurtleEnvironment
 		return resultat;
 	}
 
-	/**Transforme une coordonn�e y pour qu'elle corresponde au tore
+	/**Transforme une coordonnï¿½e y pour qu'elle corresponde au tore
 	 */
 	private int effetToreY(int y)
 	{
@@ -529,8 +524,8 @@ public class World extends TurtleEnvironment
 		return resultat;
 	}
 	
-	/**Verifie si au moins deux des voisins du patch pass� en param�tre est dans une liste fournie
-	 * (Utile pour la g�n�ration des fleuves)
+	/**Verifie si au moins deux des voisins du patch passï¿½ en paramï¿½tre est dans une liste fournie
+	 * (Utile pour la gï¿½nï¿½ration des fleuves)
 	 */
 	private Boolean voisinsPatchSontDansListe(Patch p , ArrayList<Patch> liste)
 	{

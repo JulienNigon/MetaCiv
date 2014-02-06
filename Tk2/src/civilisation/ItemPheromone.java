@@ -1,5 +1,6 @@
 package civilisation;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,16 +26,40 @@ public class ItemPheromone {
 		this.nom = nom;
 	}
 	
-	public void enregistrer(File cible) {
-		PrintWriter out;
+	
+public void enregistrer(File cible) {
+		
+		File file = new File(cible+"/"+getNom()+".xml");
+		File[] fichiers = cible.listFiles();
+		if(fichiers != null)
+		{
+			for(int i = 0; i < fichiers.length; i++)
+			{
+				if(fichiers[i].getName() == file.getName())
+				{
+					fichiers[i].delete();
+					
+				}
+				
+			}
+			
+		}
+		
+		FileWriter fw;
 		try {
-			out = new PrintWriter(new FileWriter(cible.getPath()+"/"+getNom()+Configuration.getExtension()));
-			out.println("Nom : " + getNom());
-			out.close();
+			file.createNewFile();
+			fw = new FileWriter(cible+"/"+getNom()+".xml", true);
+			BufferedWriter output = new BufferedWriter(fw);
+			output.write("<Pheromone>\n");
+					output.write("\t<Name>"+getNom()+"</Name>\n");
+			output.write("</Pheromone>");
+			output.flush();
+			output.close();
+			System.out.println("fichier créé");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 
 
 		 

@@ -21,7 +21,7 @@ public class ActionsToolBarListeObjets implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if (index == 0){
 			System.out.println("--New item--");
-			Objet o = new Objet("Default_" + Configuration.objets.size());
+			Objet o = new Objet();
 			Configuration.objets.add(o);
 			p.addObjet(o);
 			

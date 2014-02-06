@@ -1,6 +1,7 @@
 package civilisation.inspecteur.simulation;
 
 import java.awt.BorderLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -10,6 +11,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import civilisation.individu.plan.NPlan;
+import civilisation.inspecteur.simulation.amenagement.ActionsToolBarListeAmenagements;
+import civilisation.inspecteur.simulation.amenagement.PanelAmenagement;
+import civilisation.inspecteur.simulation.amenagement.PanelListeAmenagements;
 import civilisation.inspecteur.simulation.attributes.PanelAttributes;
 import civilisation.inspecteur.simulation.civilisations.ActionsToolBarListeCivilisations;
 import civilisation.inspecteur.simulation.civilisations.PanelCivilisations;
@@ -18,6 +22,8 @@ import civilisation.inspecteur.simulation.environnement.ActionsToolBarEnvironnem
 import civilisation.inspecteur.simulation.environnement.ActionsToolBarTerrains;
 import civilisation.inspecteur.simulation.environnement.PanelEnvironnement;
 import civilisation.inspecteur.simulation.environnement.PanelTerrains;
+import civilisation.inspecteur.simulation.groupManager.PanelGroupManager;
+import civilisation.inspecteur.simulation.groupManager.PanelGroupTree;
 import civilisation.inspecteur.simulation.objets.ActionsToolBarListeObjets;
 import civilisation.inspecteur.simulation.objets.PanelListeObjets;
 import civilisation.inspecteur.simulation.objets.PanelObjets;
@@ -33,6 +39,8 @@ public class PanelModificationSimulation extends JPanel{
 	JButton boutonObjets;
 	JButton boutonCivilisations;
 	JButton boutonAttribute;
+	JButton boutonGroupManager;
+	JButton boutonAmenagement;
 
 	PanelStructureCognitive panelStructureCognitive;
 	PanelEnvironnement panelEnvironnement;
@@ -42,7 +50,11 @@ public class PanelModificationSimulation extends JPanel{
 	PanelListeObjets panelListeObjets;
 	PanelCivilisations panelCivilisations;
 	PanelListeCivilisations panelListeCivilisations;
+	PanelAmenagement panelAmenagements;
+	PanelListeAmenagements panelListeAmenagements;
 	PanelAttributes panelAttributes;
+	PanelGroupTree panelGroupTree;
+	PanelGroupManager panelGroupManager;
 	
 	JPanel panelCentral;
 	JPanel panelEast;
@@ -67,6 +79,10 @@ public class PanelModificationSimulation extends JPanel{
 	JButton dezoomer;
 	JButton choisirEnvironnementActif;
 	JButton pheromone;
+	
+	JToolBar toolBarGroupManager;
+	
+	JToolBar toolBarGroupTree;
 
 	JToolBar toolBarCivilisations;
 	
@@ -82,7 +98,10 @@ public class PanelModificationSimulation extends JPanel{
 	
 	JToolBar toolBarObjets;
 	
+	JToolBar toolBarAmenagements;
+	JToolBar toolBarListeAmenagements;
 	
+	JButton createAmenagement;
 	int agentID = 0;
 	
 	
@@ -140,6 +159,18 @@ public class PanelModificationSimulation extends JPanel{
 		boutonAttribute.addActionListener(new ActionPanelCognitonsGraphiques(this, 6));
 		toolBar.add(boutonAttribute);
 		
+		ImageIcon iconeGroupManager = new ImageIcon(this.getClass().getResource("../icones/blue-document-attribute.png"));	
+		boutonGroupManager = new JButton(iconeGroupManager);
+		boutonGroupManager.setToolTipText("Manage group");
+		boutonGroupManager.addActionListener(new ActionPanelCognitonsGraphiques(this, 7));
+		toolBar.add(boutonGroupManager);
+		
+		ImageIcon iconeAmenagement = new ImageIcon(this.getClass().getResource("../icones/tree--plus.png"));	
+		boutonAmenagement = new JButton(iconeAmenagement);
+		boutonAmenagement.setToolTipText("Edit amenagements");
+		boutonAmenagement.addActionListener(new ActionPanelCognitonsGraphiques(this, 8));
+		toolBar.add(boutonAmenagement);
+		
 		TitledBorder bordure = BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "Arborescence d'actions");
 		bordure.setTitleJustification(TitledBorder.LEFT);
 
@@ -154,7 +185,9 @@ public class PanelModificationSimulation extends JPanel{
 		panelListeCivilisations = new PanelListeCivilisations(panelCivilisations);
 		panelCivilisations.setPanelListeCivilisations(panelListeCivilisations);
 		panelAttributes = new PanelAttributes(this);
-
+		panelAmenagements = new PanelAmenagement(this, panelListeAmenagements);
+		panelListeAmenagements = new PanelListeAmenagements(panelAmenagements);
+		
 		panelArbreActions.setBorder(bordure);
 		bordure.setTitle("Structure cognitive");
 		panelStructureCognitive.setBorder(bordure);
@@ -245,6 +278,7 @@ public class PanelModificationSimulation extends JPanel{
 		choisirEnvironnementActif.setToolTipText("Choisir l'environnment ˆ utiliser pour la simulation");
 		toolBarEnvironnement.add(choisirEnvironnementActif);
 
+
 		ImageIcon iconePheromone = new ImageIcon(this.getClass().getResource("../icones/ui-color-picker-switch.png"));
 		pheromone = new JButton(iconePheromone);
 		pheromone.addActionListener(new ActionsToolBarEnvironnement(panelEnvironnement,9));
@@ -293,6 +327,19 @@ public class PanelModificationSimulation extends JPanel{
 		
 		/*Creation de la toolBar pour le panel des civilisations*/	
 		toolBarCivilisations = new JToolBar();
+		
+		/*Creation de la toolBar pour le panel des amenagements*/
+		toolBarAmenagements = new JToolBar();
+		
+		/*Creation de la toolBar pour la liste des amenagements */
+		toolBarListeAmenagements = new JToolBar();
+		
+		icone = new ImageIcon(this.getClass().getResource("../icones/tree--plus.png"));
+		
+		createAmenagement = new JButton(icone);
+		createAmenagement.addActionListener(new ActionsToolBarListeAmenagements(panelListeAmenagements,0));
+		createAmenagement.setToolTipText("Create new amenagement");
+		toolBarListeAmenagements.add(createAmenagement);
 		
 		this.add(toolBar, BorderLayout.WEST);
 		afficherStructureCognitive();
@@ -438,12 +485,40 @@ public class PanelModificationSimulation extends JPanel{
 		this.add(panelCentral, BorderLayout.CENTER);
 	}
 	
+	public void afficherAmenagements() {
+		
+		setPanelButtonAvailable();
+		this.boutonAmenagement.setEnabled(false);
+
+		if (panelCentral != null){
+			this.remove(panelCentral);
+		}
+		panelCentral = new JPanel();
+		panelCentral.setLayout(new BorderLayout());
+		
+		panelCentral.add(panelAmenagements, BorderLayout.CENTER);
+
+		if (panelEast != null){
+			this.remove(panelEast);
+		}
+		panelEast = new JPanel();
+		panelEast.setLayout(new BorderLayout());
+		
+		panelEast.add(panelListeAmenagements, BorderLayout.CENTER);
+		panelEast.add(toolBarListeAmenagements, BorderLayout.NORTH);
+
+		this.add(panelCentral, BorderLayout.CENTER);
+		this.add(panelEast, BorderLayout.EAST);
+	}
+	
 	private void setPanelButtonAvailable(){
 		this.boutonStructureCognitive.setEnabled(true);
 		this.boutonObjets.setEnabled(true);
 		this.boutonEnvironnement.setEnabled(true);
 		this.boutonCivilisations.setEnabled(true);
 		this.boutonAttribute.setEnabled(true);
+		this.boutonGroupManager.setEnabled(true);
+		this.boutonAmenagement.setEnabled(true);
 	}
 	
 	public void changerArbreActions(NPlan plan){
@@ -479,6 +554,34 @@ public class PanelModificationSimulation extends JPanel{
 
 	public PanelListeObjets getPanelListeObjets() {
 		return panelListeObjets;
+	}
+
+	public void showGroupManager() {
+		//TODO
+		setPanelButtonAvailable();
+		this.boutonGroupManager.setEnabled(false);
+
+		if (panelCentral != null){
+			this.remove(panelCentral);
+		}
+		panelCentral = new JPanel();
+		panelCentral.setLayout(new BorderLayout());
+		
+		panelCentral.add(panelGroupManager, BorderLayout.CENTER);
+		panelCentral.add(toolBarGroupManager, BorderLayout.NORTH);
+
+		
+		if (panelEast != null){
+			this.remove(panelEast);
+		}
+		panelEast = new JPanel();
+		panelEast.setLayout(new BorderLayout());
+		
+		panelEast.add(panelGroupTree, BorderLayout.CENTER);
+		panelEast.add(toolBarGroupTree, BorderLayout.NORTH);
+		
+		this.add(panelCentral, BorderLayout.CENTER);
+		this.add(panelEast, BorderLayout.EAST);			
 	}
 	
 

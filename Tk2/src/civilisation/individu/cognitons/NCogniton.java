@@ -1,6 +1,7 @@
 package civilisation.individu.cognitons;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -63,12 +64,15 @@ public class NCogniton{
 				);
 	}
 
-	public void mettreEnPlace(Esprit e){
+	public void mettreEnPlace(Esprit e,double weight){
+		System.out.println("test");
 		modifierPlans(true , e);
 		if (plansAutorises.isEmpty()){ 
-			appliquerPoids(e);
+			System.out.println("No plans autorises");
+			appliquerPoids(e,weight);
 		}
 		else{
+			System.out.println("Plan autorise "+plansAutorises.get(0).getNom());
 			e.redefinirPoids();
 		}
 	}
@@ -76,11 +80,11 @@ public class NCogniton{
 	
 	
 	
-	public void appliquerPoids(Esprit e)
+	public void appliquerPoids(Esprit e, double weight)
 	{
 		for (int i = 0 ; i < liensPlans.size() ; i++)
 		{
-			e.modifierPoids(liensPlans.get(i).getP(), liensPlans.get(i).getPoids());
+			e.modifierPoids(liensPlans.get(i).getP(), weight);
 		}
 	}
 	
@@ -93,11 +97,10 @@ public class NCogniton{
 	 */
 	public void modifierPlans(Boolean add, Esprit e)
 	{
-		//.out.println("Modifier projet:" + getNom());
 		//Plan nPlans[] = getTabNouveauxPlans(e);
 		if (!plansAutorises.isEmpty())
 		{
-			//System.out.println("Modifier projet != null:" + getNom());
+			
 			int taille = plansAutorises.size();
 			if (add)
 			{
@@ -198,47 +201,96 @@ public class NCogniton{
 	}
 
 	public void enregistrer(File cible) {
-		PrintWriter out;
+		File file = new File(cible+"/"+getNom()+".xml");
+		File[] fichiers = cible.listFiles();
+		if(fichiers != null)
+		{
+			for(int i = 0; i < fichiers.length; i++)
+			{
+				if(fichiers[i].getName() == file.getName())
+				{
+					fichiers[i].delete();
+					
+				}
+				
+			}
+			
+		}
+		
+		FileWriter fw;
 		try {
-			out = new PrintWriter(new FileWriter(cible.getPath()+"/"+getNom()+Configuration.getExtension()));
-			out.println("Nom : " + getNom());
-			out.println("Description : " + getDescription());
-			out.println("Type : " + getType());
-			out.println("StartChance : " + this.startChance);
-			if (recuAuDemarrage){
-				out.println("Initial : 1");
-			}
-			else{
-				out.println("Initial : 0");
-			}
-			
-			for (int i = 0; i < this.plansAutorises.size() ;i++){
-				out.println("Permet : "+plansAutorises.get(i).getNom());
-			} 
-			
-			for (int i = 0; i < this.liens.size() ;i++){
-				out.println("Chaine : "+ this.liens.get(i).getC().getNom() + "," + this.liens.get(i).getPoids());
-			}
-			
-			for (int i = 0; i < this.liensPlans.size() ;i++){
-				out.println("Influence : "+liensPlans.get(i).getP().getNom()+","+liensPlans.get(i).getPoids());
-			}
-			
-	    	for (int i = 0; i < nHues; i++) {
-				out.println("Hue" + i + " : " + hues[i]);
-	    	}
-	    	
-	    	for (int i = 0; i < triggeringAttributes.size(); i++) {
-				out.println("Trigger : " + triggeringAttributes.get(i)[0] + "," + triggeringAttributes.get(i)[1] + "," + triggeringAttributes.get(i)[2]);
-	    	}
-			
-			out.close();
+			fw = new FileWriter(cible+"/"+getNom()+".xml", true);
+			BufferedWriter output = new BufferedWriter(fw);
+			output.write("<Cogniton>\n");
+					output.write("\t<Name>"+getNom()+"</Name>\n");
+					output.write("\t<Description>"+this.getDescription()+"</Description>\n");
+					output.write("\t<Type>"+this.getType()+"</Type>\n");
+					if(this.recuAuDemarrage)
+					{
+						output.write("\t<Initial>"+1+"</Initial>\n");
+					}
+					else
+					{
+						output.write("\t<Initial>"+0+"</Initial>\n");
+					}
+					output.write("\t<Permet>\n");
+					for (int i = 0; i < this.plansAutorises.size() ;i++)
+					{
+						output.write("\t\t<ActionPermet>"+plansAutorises.get(i).getNom()+"</ActionPermet>\n");
+					}
+					output.write("\t</Permet>\n");
+					output.write("\t<Influences>\n");
+					for (int i = 0; i < this.liensPlans.size() ;i++)
+					{
+						output.write("\t\t<Influence>\n");
+							output.write("\t\t\t<ActionInflus>"+liensPlans.get(i).getP().getNom()+"</ActionInflus>\n");
+							output.write("\t\t\t<ValInflus>"+liensPlans.get(i).getPoids()+"</ValInflus>\n");
+						output.write("\t\t</Influence>\n");
+					}
+					output.write("\t</Influences>\n");
+					output.write("\t<Chaine>\n");
+					if(this.liens != null)
+					{
+						for (int i = 0; i < this.liens.size() ;i++)
+						{
+							output.write("\t\t<Val1>"+this.liens.get(i).getC().getNom()+"</Val1>\n");
+							output.write("\t\t<Val2>"+this.liens.get(i).getPoids()+"</Val2>\n");
+						}
+					}
+					
+					output.write("\t</Chaine>\n");
+					output.write("\t<Hues>\n");
+					if(this.liens != null)
+					{
+
+							output.write("\t\t<ValHue>"+0+"</ValHue>\n");
+					}
+					output.write("\t</Hues>\n");
+					output.write("\t<Triggers>\n");
+					if(this.liens != null)
+					{
+						for (int i = 0; i < triggeringAttributes.size() ;i++)
+						{
+							output.write("\t\t<Trigger>"+this.hues[i]+"\n");
+								output.write("\t\t\t<ValTrig1>"+triggeringAttributes.get(i)[0]+"</ValTrig1>\n");
+								output.write("\t\t\t<ValTrig2>"+triggeringAttributes.get(i)[1]+"</ValTrig2>\n");
+								output.write("\t\t\t<ValTrig3>"+triggeringAttributes.get(i)[2]+"</ValTrig3>\n");
+							output.write("\t</Triggers>\n");
+						}
+					}
+					output.write("\t</Triggers>\n");
+			output.write("</Cogniton>");
+			output.flush();
+			output.close();
+			System.out.println("fichier créé");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
-	}
+		}
 
+
+		 
+	}
 	public ArrayList<Object[]> getTriggeringAttributes() {
 		return triggeringAttributes;
 	}

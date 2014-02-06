@@ -2,6 +2,8 @@ package civilisation.individu.plan.action;
 
 import java.util.ArrayList;
 
+import civilisation.GroupAndRole;
+import civilisation.GroupModel;
 import civilisation.ItemPheromone;
 import civilisation.individu.cognitons.NCogniton;
 import civilisation.inventaire.Objet;
@@ -50,7 +52,21 @@ public class OptionsActions {
 			for (int i = 0; i < parametres.size(); i++){
 				if (parametres.get(i).getClass().equals(Objet.class)){
 					s += "Objet "; /*Note the space before the name*/
-					s += ((Objet) parametres.get(i)).getNom();
+					s += ((Objet) parametres.get(i)).getName();
+					if (i < parametres.size() - 1){
+						s += ";"; /*Separate multiple parameters*/
+					}
+				}
+				if (parametres.get(i).getClass().equals(GroupModel.class)){
+					s += "Group "; /*Note the space before the name*/
+					s += ((GroupModel) parametres.get(i)).getName();
+					if (i < parametres.size() - 1){
+						s += ";"; /*Separate multiple parameters*/
+					}
+				}
+				if (parametres.get(i).getClass().equals(GroupAndRole.class)){
+					s += "GroupAndRole "; /*Note the space before the name*/
+					s += ((GroupAndRole) parametres.get(i)).getGroupModel().getName() +":"+((GroupAndRole) parametres.get(i)).getRole();
 					if (i < parametres.size() - 1){
 						s += ";"; /*Separate multiple parameters*/
 					}

@@ -7,6 +7,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import civilisation.Configuration;
+import civilisation.inspecteur.animations.JJIconSelector;
 import civilisation.inspecteur.simulation.PanelModificationSimulation;
 import civilisation.inventaire.Objet;
 
@@ -17,6 +19,7 @@ public class PanelObjets extends JPanel{
 	
 	JTextField nameField;
 	JComboBox comboIcon;
+	JJIconSelector iconSelector;
 	
 	public PanelObjets (PanelModificationSimulation panelParent , PanelListeObjets panelListeObjets){
 		super();
@@ -32,6 +35,9 @@ public class PanelObjets extends JPanel{
 		nameField.addActionListener(new ActionPanelObjet(this));
 		this.add(nameField);
 		
+		iconSelector = new JJIconSelector(Configuration.pathToIcon);
+		this.add(iconSelector);
+		
 		this.add(new JLabel("Icon :"));
 		comboIcon = new JComboBox();
 		
@@ -44,7 +50,7 @@ public class PanelObjets extends JPanel{
 	 * Update data according to selected item in ItemList
 	 */
 	public void update(){		
-		nameField.setText(((Objet) panelListeObjets.getListeObjets().getSelectedValue()).getNom()  );
+		nameField.setText(((Objet) panelListeObjets.getListeObjets().getSelectedValue()).getName()  );
 	}
 
 	public PanelListeObjets getPanelListeObjets() {
@@ -59,7 +65,7 @@ public class PanelObjets extends JPanel{
 		if (panelListeObjets != null){
 			if ( panelListeObjets.getListeObjets().getSelectedValue() != null) {
 				Objet o = ((Objet) panelListeObjets.getListeObjets().getSelectedValue());
-				o.setNom(nameField.getText());
+				o.setName(nameField.getText());
 			}
 		}
 	}

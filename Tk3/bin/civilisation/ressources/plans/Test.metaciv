@@ -1,0 +1,5 @@
+Nom : Test
+Action : L_Repeat,n(Integer 41)
+	Action : A_AvanceAleatoirement
+Action : L_Repeat,n(Integer 11)
+	Action : A_Rentrer

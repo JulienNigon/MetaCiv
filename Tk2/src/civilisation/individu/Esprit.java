@@ -10,10 +10,9 @@ import java.util.Stack;
 
 import civilisation.Configuration;
 import civilisation.Group;
+import civilisation.GroupAndRole;
 import civilisation.individu.cognitons.NCogniton;
 import civilisation.individu.cognitons.CCogniton;
-
-
 import civilisation.individu.plan.NPlan;
 import civilisation.individu.plan.NPlanPondere;
 import civilisation.individu.plan.action.Action;
@@ -28,7 +27,7 @@ import civilisation.individu.plan.action.Action;
 
 public class Esprit {
 	
-	/* Les diff≈Ωrentes listes contenants les croyances de l'agent */
+	/* Les différentes listes contenants les croyances de l'agent */
 	ArrayList<CCogniton> cognitons;
 	
 	/* La liste des projets envisageable par l'agent*/
@@ -64,24 +63,18 @@ public class Esprit {
 		this.h = h;
 		progression = 0;
 		poidsTotalPlan = 0;
+		initialisationStandard();
 		
-		/*Si l'agent a des parents (ie : il n'a pas ≈Ωt≈Ω g≈Ωn≈Ωr≈Ω au d≈Ωbut), on calcul ce qu'il obtient de ses parents*/
-		if (h.getMere() != null)
-		{
-			//TODO
-		}
-		else
-		{
-			initialisationStandard();
-		}
 	}
 	
 	/**
-	 * Initialise les cognitons
+	 * Initialize cognitons
 	 */
 	private void initialisationStandard()
 	{
+		
 		for (NCogniton cogni : Configuration.cognitonsDeBase) {
+			cogni.setStartChance(100);
 			if (Math.random() * 100.0 < (double)cogni.getStartChance())
 			cognitons.add(new CCogniton(cogni));
 		}
@@ -112,13 +105,10 @@ public class Esprit {
 			}
 		}
 
-		/* Select the new plan if there are no plan to do */
+		/* Select the new plan if there are no action to do */
 		if ((/*planEnCours == null && */actionEnCours == null))
 		{
 			computeTotalWeight(); //TODO : remove and re-write dynamic evolution of total weight
-			//System.out.println("Poids total :" + poidsTotalPlan);
-			//System.out.println(plans);
-			//System.out.println(cognitons);
 			int alea = (int) (Math.random()*(poidsTotalPlan + 1));
 			int i = 0;
 			while (alea > plans.get(i).getPoids() /*|| plans.get(i).getType() == 1*/)
@@ -128,9 +118,6 @@ public class Esprit {
 			}
 			planEnCours = plans.get(i);
 			actions.push(null); //end of plan marker
-			//System.out.println("Agent choisi le plan : " + planEnCours.toString());
-		} else {
-			//System.out.println(actions);
 		}
 		planEnCours.activer(actionEnCours);
 		this.actionEnCours = actions.pop();
@@ -186,9 +173,9 @@ public class Esprit {
 	/**
 	 * Change le poids actuel d'un plan
 	 * @param plan : Le plan à modifier
-	 * @param p : le poids à ajouter
+	 * @param weight : le poids à ajouter
 	 */
-	public void modifierPoids(NPlan plan, int p) 
+	public void modifierPoids(NPlan plan, double weight) 
 	{
 		int i = 0;
 		//System.out.println(projets.get(i).getClass().getName());
@@ -203,7 +190,7 @@ public class Esprit {
 
 		if (plans.size() > 0 && i < plans.size())
 		{
-			plans.get(i).changerPoids(p);
+			plans.get(i).changerPoids(weight);
 		}
 		else{
 		}
@@ -296,7 +283,7 @@ public class Esprit {
 
 	public void addCogniton(NCogniton cogni){
 		cognitons.add(new CCogniton(cogni));
-		cogni.mettreEnPlace(this);
+		cogni.mettreEnPlace(this , 1.0); //1.0 is the standard weigth for new cogniton
 	}
 
 	public void removeCogniton(NCogniton c) {
@@ -326,6 +313,14 @@ public class Esprit {
 		this.actions = actions;
 	}
 	
+	public HashMap<Group, String> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(HashMap<Group, String> groups) {
+		this.groups = groups;
+	}
+
 	public boolean ownCogniton(NCogniton cogniton) {
 		
 		for (int i = 0 ; i < this.cognitons.size(); i++) {
@@ -343,6 +338,50 @@ public class Esprit {
 				poidsTotalPlan += plans.get(i).getPoids();
 			}
 		}
+	}
+	
+	/**
+	 * Return the cogniton of type t
+	 * @param t
+	 * @return a cogniton of type t (or null if there is any cogniton of this type)
+	 */
+	public CCogniton getCognitonOfType(NCogniton t) {
+		CCogniton c = null;
+		for (int i = 0 ; i < cognitons.size() ; i++) {
+			if (cognitons.get(i).getCogniton().equals(t)) {
+				c = cognitons.get(i);
+			}
+		}
+		return c;
+	}
+	
+	/**
+	 * Change the weight of a cogniton of type t
+	 * @param t : the type of cogniton to change
+	 */
+	public void changeWeightOfCognitonOfType(NCogniton t , Double d) {
+		for (int i = 0 ; i < cognitons.size() ; i++) {
+			if (cognitons.get(i).getCogniton().equals(t)) {
+				cognitons.get(i).setWeigth(cognitons.get(i).getWeigth() + d);
+			}
+		}
+		this.redefinirPoids();
+	}
+
+	public boolean hasGroupAndRole(GroupAndRole groupAndRoleToMap) {
+		Object[] tab = groups.keySet().toArray();
+
+		for (int i = 0 ; i < groups.size(); i++) {
+			System.out.println(groupAndRoleToMap.getGroupModel().getName() + " " + ((Group)tab[i]).getGroupModel().getName());
+			System.out.println(groupAndRoleToMap.getRole() + " " + groups.get(tab[i]));
+			
+			if (((Group)tab[i]).getGroupModel().getName().equals(groupAndRoleToMap.getGroupModel().getName()) && groups.get(tab[i]).equals(groupAndRoleToMap.getRole())) {
+				System.out.println("has g&r");
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	

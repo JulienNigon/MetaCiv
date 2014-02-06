@@ -66,7 +66,7 @@ public class NPlanPondere {
 	 * Modifie le poids du projet d'un poids p,
 	 * Demande à l'esprit concerné de modifier le poids total en conséquence
 	 */
-	public void changerPoids(int p)
+	public void changerPoids(double weight)
 	{
 		//TODO : Just a fast solution, MUST be improved for performance issues
 		e.computeTotalWeight();
@@ -95,7 +95,7 @@ public class NPlanPondere {
 		{
 			e.addPoidsTotal(p);
 		}*/
-		poids += p;
+		poids += weight;
 	}
 	
 	@Override

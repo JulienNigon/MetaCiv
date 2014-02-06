@@ -1,0 +1,12 @@
+<Terrain>
+	<Name>Mer</Name>
+	<Passabilite>30</Passabilite>
+	<Infranchissable>false</Infranchissable>
+	<Pheromones>
+	</Pheromones>
+	<Couleur>
+		<R>51</R>
+		<G>51</G>
+		<B>255</B>
+	</Couleur>
+</Terrain>

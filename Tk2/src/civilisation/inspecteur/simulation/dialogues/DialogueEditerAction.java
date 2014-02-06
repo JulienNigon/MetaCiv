@@ -13,7 +13,9 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
 import civilisation.Configuration;
+import civilisation.GroupAndRole;
 import civilisation.individu.plan.action.Action;
 import civilisation.individu.plan.action.Comparator;
 import civilisation.individu.plan.action.OptionsActions;
@@ -44,10 +46,15 @@ public class DialogueEditerAction extends JDialog implements ActionListener, Pro
 				JComboBox box = new JComboBox();
 				if (schema.get(i)[0].equals("**Objet**")){
 					for (int j = 0; j < Configuration.objets.size(); j++){
-						box.addItem(Configuration.objets.get(j).getNom());
+						box.addItem(Configuration.objets.get(j).getName());
 					}
 				}
-				if (schema.get(i)[0].equals("**Pheromone**")){
+				else if (schema.get(i)[0].equals("**Cogniton**")){
+					for (int j = 0; j < Configuration.cognitons.size(); j++){
+						box.addItem(Configuration.cognitons.get(j).getNom());
+					}
+				}
+				else if (schema.get(i)[0].equals("**Pheromone**")){
 					for (int j = 0; j < Configuration.itemsPheromones.size(); j++){
 						box.addItem(Configuration.itemsPheromones.get(j).getNom());
 					}
@@ -69,6 +76,20 @@ public class DialogueEditerAction extends JDialog implements ActionListener, Pro
 						box.addItem(Configuration.attributesNames.get(j));
 					}
 				}
+				else if (schema.get(i)[0].equals("**Group**")){
+					for (int j = 0; j < Configuration.groups.size(); j++){
+						box.addItem(Configuration.groups.get(j).getName());
+					}
+				}
+				else if (schema.get(i)[0].equals("**GroupAndRole**")){
+					for (int j = 0; j < Configuration.groups.size(); j++){
+						System.out.println(Configuration.groups.size() + " j : " + j + "keyset size : " + Configuration.groups.get(j).getCulturons().keySet().size());
+						Object[] keys = (Object[]) Configuration.groups.get(j).getCulturons().keySet().toArray();
+						for (int k = 0 ; k < Configuration.groups.get(j).getCulturons().size() ; k++) {
+							box.addItem(Configuration.groups.get(j).getName()+":"+(String)keys[k]);	
+						}
+					}
+				}
 				else if (schema.get(i)[0].equals("**Comparator**")){
 					for (int j = 0; j < Comparator.values().length ; j++){
 						box.addItem(Comparator.values()[j].toSymbol());
@@ -88,7 +109,7 @@ public class DialogueEditerAction extends JDialog implements ActionListener, Pro
 		    array = boxs.toArray();
 		}
 		else{
-			JLabel label = new JLabel("Cette action n'est pas Žditable!");
+			JLabel label = new JLabel("Cette action n'est pas Å½ditable!");
 		    array = new Object[1];
 		    array[0] = label;
 		}
@@ -127,19 +148,31 @@ public class DialogueEditerAction extends JDialog implements ActionListener, Pro
 					OptionsActions opt = null;
 
 					if (schema.get(i)[0].equals("**Objet**")){
-						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxime terme est toujours le nom du paramtre pour les paramtres complexes*/
+						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxiï¿½me terme est toujours le nom du paramï¿½tre pour les paramï¿½tres complexes*/
 						opt.addParametre(Configuration.getObjetByName((String)boxs.get(i).getSelectedItem()));
 					}
 					else if (schema.get(i)[0].equals("**Pheromone**")){
-						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxime terme est toujours le nom du paramtre pour les paramtres complexes*/
+						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxiï¿½me terme est toujours le nom du paramï¿½tre pour les paramï¿½tres complexes*/
 						opt.addParametre(Configuration.getPheromoneByName((String)boxs.get(i).getSelectedItem()));
 					}
+					else if (schema.get(i)[0].equals("**Cogniton**")){
+						opt = new OptionsActions(schema.get(i)[1]);
+						opt.addParametre(Configuration.getCognitonByName((String)boxs.get(i).getSelectedItem()));
+					}
+					else if (schema.get(i)[0].equals("**Group**")){
+						opt = new OptionsActions(schema.get(i)[1]);
+						opt.addParametre(Configuration.getGroupModelByName((String)boxs.get(i).getSelectedItem()));
+					}
+					else if (schema.get(i)[0].equals("**GroupAndRole**")){
+						opt = new OptionsActions(schema.get(i)[1]);
+						opt.addParametre(new GroupAndRole((String)boxs.get(i).getSelectedItem()));
+					}
 					else if (schema.get(i)[0].equals("**Integer**")){
-						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxime terme est toujours le nom du paramtre pour les paramtres complexes*/
+						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxiï¿½me terme est toujours le nom du paramï¿½tre pour les paramï¿½tres complexes*/
 						opt.addParametre((Integer)boxs.get(i).getSelectedItem());
 					}
 					else if (schema.get(i)[0].equals("**Double**")){
-						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxime terme est toujours le nom du paramtre pour les paramtres complexes*/
+						opt = new OptionsActions(schema.get(i)[1]); /*Le deuxiï¿½me terme est toujours le nom du paramï¿½tre pour les paramï¿½tres complexes*/
 						opt.addParametre((Double)boxs.get(i).getSelectedItem());
 					}
 					else if (schema.get(i)[0].equals("**Attribute**")){

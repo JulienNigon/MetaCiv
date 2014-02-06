@@ -1,0 +1,21 @@
+<Cogniton>
+	<Name>Cognitest</Name>
+	<Description>Un nouveau cogniton</Description>
+	<Type>BELIEF</Type>
+	<Initial>1</Initial>
+	<Permet>
+		<ActionPermet>Test</ActionPermet>
+	</Permet>
+	<Influences>
+		<Influence>
+			<ActionInflus>Test</ActionInflus>
+			<ValInflus>3</ValInflus>
+		</Influence>
+	</Influences>
+	<Chaine>
+	</Chaine>
+	<Hues>
+	</Hues>
+	<Triggers>
+	</Triggers>
+</Cogniton>

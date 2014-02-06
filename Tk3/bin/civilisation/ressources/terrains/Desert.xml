@@ -1,0 +1,12 @@
+<Terrain>
+	<Name>Desert</Name>
+	<Passabilite>15</Passabilite>
+	<Infranchissable>false</Infranchissable>
+	<Pheromones>
+	</Pheromones>
+	<Couleur>
+		<R>204</R>
+		<G>204</G>
+		<B>0</B>
+	</Couleur>
+</Terrain>

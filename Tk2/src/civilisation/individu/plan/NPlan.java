@@ -1,5 +1,6 @@
 package civilisation.individu.plan;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import civilisation.Configuration;
 import civilisation.individu.Esprit;
 import civilisation.individu.Humain;
 import civilisation.individu.plan.action.Action;
+import civilisation.inventaire.Objet;
 
 public class NPlan {
 
@@ -19,7 +21,7 @@ public class NPlan {
 	ArrayList<Action> actions;
 	Boolean isBirthPlan = false;
 	Boolean isSelfPlan = false;
-
+	int i = 0;
 	public NPlan(){
 		actions = new ArrayList<Action>();
 	}
@@ -29,16 +31,14 @@ public class NPlan {
 	 * @param h : L'agent effectuant l'action
 	 */
 	public void activer(Humain h , Action action){
-	    //System.out.println("this lance : " + this.getNom());
+	//    System.out.println("this lance : " + this.getNom());
 
 		if (action == null){
-		  //  System.out.println("plan lance : " + nom);
-			Action a = actions.get(0).effectuer(h);
+			Action a = actions.get(i).effectuer(h);
 			if (a != null) h.getEsprit().getActions().push(a);
 			h.getEsprit().setActionEnCours(a);
 		}
 		else {
-			//System.out.println("else" + nom);
 			Action a = action.effectuer(h);
 			if (a != null) h.getEsprit().getActions().push(a);
 		}
@@ -143,25 +143,120 @@ public class NPlan {
 		this.isSelfPlan = isSelfPlan;
 	}
 
-	public void enregistrer(File cible) {
-		PrintWriter out;
-		System.out.println("Sauvegarde du plan : " + nom);
-		try {
-			out = new PrintWriter(new FileWriter(cible.getPath()+"/"+getNom()+Configuration.getExtension()));
-			out.println("Nom : " + getNom());
-			out.println("Birth : " + isBirthPlan);
-			out.println("Self : " + isSelfPlan);
-
-			if (actions.isEmpty() !=  true){
-				ecrireAction(out,0,actions.get(0));
+	public void enregistrer(File cible)
+	{
+		File file = new File(cible+"/"+getNom()+".xml");
+		File[] fichiers = cible.listFiles();
+		if(fichiers != null)
+		{
+			for(int i = 0; i < fichiers.length; i++)
+			{
+				if(fichiers[i].getName() == file.getName())
+				{
+					fichiers[i].delete();
+					
+				}
+				
 			}
 			
-			
-			out.close();
+		}
+		
+		FileWriter fw;
+		try {
+			file.createNewFile();
+			fw = new FileWriter(cible+"/"+getNom()+".xml", true);
+			BufferedWriter output = new BufferedWriter(fw);
+			output.write("<Plan>\n");
+					output.write("\t<Nom>"+getNom()+"</Nom>\n");
+					output.write("\t<Birth>"+isBirthPlan+"</Birth>\n");
+					output.write("\t<Self>"+isSelfPlan+"</Self>\n");
+					output.write("\t<Actions>\n");
+					for (int i = 0; i < this.actions.size() ;i++)
+					{
+						output.write("\t\t<Action>\n");
+								output.write("\t\t\t<NomAction>"+this.actions.get(i).getSimpleName()+"</NomAction> \n");
+								output.write("\t\t\t<Variables>\n");
+							for(int j = 0; j< this.actions.get(i).getOptions().size();j++)
+							{
+								output.write("\t\t\t\t<Variable>\n");
+											output.write("\t\t\t\t\t<NomVariable>"+this.actions.get(i).getOptions().get(j).getName()+"</NomVariable>\n");
+									ArrayList<Object> parametres = this.actions.get(i).getOptions().get(j).getParametres();
+									for (int k = 0; k < parametres.size(); k++){
+										if (parametres.get(k).getClass().equals(Objet.class)){
+											output.write("\t\t\t\t\t<TypeVariable>Objet</TypeVariable>\n");
+										}
+										if (parametres.get(k).getClass().equals(Integer.class)){
+											output.write("\t\t\t\t\t<TypeVariable>Integer</TypeVariable>\n");
+										}
+										if (parametres.get(k).getClass().equals(String.class)){
+											output.write("\t\t\t\t\t<TypeVariable>Attribute</TypeVariable>\n");
+										}
+										output.write("\t\t\t\t\t<ValeurVariable>"+parametres.get(k)+"</ValeurVariable>\n");
+									}			
+									output.write("\t\t\t\t</Variable>\n");
+							}
+									output.write("\t\t\t</Variables>\n");
+							/*		System.out.println("Test action " + 0 + " : "+this.actions.get(i).getName());
+									System.out.println("Taille action " + this.actions.size());*/
+									RecursAction(this.actions.get(i),0,output);
+						output.write("\t\t</Action>\n");
+					}
+					output.write("\t</Actions>\n");
+			output.write("</Plan>");
+			output.flush();
+			output.close();
+			System.out.println("fichier créé");
 		} catch (IOException e) {
-			// TODO Self-generated catch block
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+	}
+	
+	private void RecursAction(Action action , int niveau, BufferedWriter output)
+	{
+		try
+		{
+			if(action.getListeActions().size() > 0)
+			{
+				for(int i= 0; i < niveau ; ++i){output.write("\t\t\t"); }output.write("\t\t\t<SousActions"+niveau+">\n");
+				System.out.println("Slots : "+action.getListeActions().size());
+					for(int j = 0; j< action.getListeActions().size();j++)
+					{
+						for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t"); }output.write("\t\t\t\t<SousAction"+niveau+">\n");
+						Action sact = action.getListeActions().get(j);
+						for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t\t"); }output.write("\t\t\t\t\t<SousActionName"+niveau+">"+ sact.getSimpleName() +"</SousActionName"+niveau+">\n");
+						for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t\t"); }output.write("\t\t\t\t\t<SousActionVariables"+niveau+">\n");
+						for(int k = 0; k < sact.getOptions().size();k++)
+						{
+							for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t\t"); }output.write("\t\t\t\t\t<SousActionVariable"+niveau+">\n");
+							for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t\t\t"); }output.write("\t\t\t\t\t\t<SousActionNomVariable"+niveau+">"+sact.getOptions().get(k).getName()+"</SousActionNomVariable"+niveau+">\n");
+								ArrayList<Object> parametres = sact.getOptions().get(k).getParametres();
+								for (int l = 0; l < parametres.size(); l++){
+									if (parametres.get(l).getClass().equals(Objet.class)){
+										for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t\t\t"); }output.write("\t\t\t\t\t\t<SousActionTypeVariable"+niveau+">Objet</SousActionTypeVariable"+niveau+">\n");
+									}
+									if (parametres.get(l).getClass().equals(Integer.class)){
+										for(int i= 0; i < niveau ; ++i){output.write("\t\t\t\t\t\t"); }output.write("\t\t\t\t\t\t<SousActionTypeVariable"+niveau+">Integer</SousActionTypeVariable"+niveau+">\n");
+									}
+									if (parametres.get(l).getClass().equals(String.class)){
+										for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t\t\t"); }output.write("\t\t\t\t\t\t<SousActionTypeVariable"+niveau+">Attribute</SousActionTypeVariable"+niveau+">\n");
+									}
+									for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t\t\t"); }output.write("\t\t\t\t\t\t<SousActionValeurVariable"+niveau+">"+parametres.get(l)+"</SousActionValeurVariable"+niveau+">\n");
+								}			
+								for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t\t"); }output.write("\t\t\t\t\t</SousActionVariable"+niveau+">\n");
+						}
+						for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t\t"); }output.write("\t\t\t\t\t</SousActionVariables"+niveau+">\n");
+						RecursAction(sact,niveau + 1,output);
+						for(int i= 0; i < niveau; ++i){output.write("\t\t\t\t"); }output.write("\t\t\t\t</SousAction"+niveau+">\n");
+					}
+					
+					for(int i= 0; i < niveau; ++i){output.write("\t\t\t"); }output.write("\t\t\t</SousActions"+niveau+">\n");
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void ecrireAction(PrintWriter out, int iteration, Action a){

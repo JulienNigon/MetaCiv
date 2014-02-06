@@ -1,6 +1,7 @@
 package civilisation.world;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class Terrain {
 		couleur = Color.BLACK;
 		passabilite = passabiliteParDefaut;
 		infranchissable = false;
+		//Configuration.couleurs_terrains.put(couleur, this);
 	}
 
 	public int getPassabilite() {
@@ -81,26 +83,60 @@ public class Terrain {
 	}
 	
 	public void enregistrer(File cible) {
-		PrintWriter out;
-		try {
-			
-		    float hsb[] = Color.RGBtoHSB( this.getCouleur().getRed(),this.getCouleur().getGreen(),this.getCouleur().getBlue(), null );
-			
-			out = new PrintWriter(new FileWriter(cible.getPath()+"/"+getNom()+Configuration.getExtension()));
-			out.println("Nom : " + getNom());
-			out.println("Couleur : "+hsb[0]+","+hsb[1]+","+hsb[2]);
-			out.println("Passabilite : "+this.getPassabilite());
-			out.println("Infranchissable : " + infranchissable);
-
-			for (int i = 0; i < this.pheromones.size();i++){
-				out.println("Pheromone : " + pheromones.get(i).getNom() + "," + pheroInitiales.get(i)  + "," + pheroCroissance.get(i));
+		File file = new File(cible+"/"+getNom()+".xml");
+		File[] fichiers = cible.listFiles();
+		if(fichiers != null)
+		{
+			for(int i = 0; i < fichiers.length; i++)
+			{
+				if(fichiers[i].getName() == file.getName())
+				{
+					fichiers[i].delete();
+					
+				}
+				
 			}
 			
-			out.close();
+		}
+		
+		FileWriter fw;
+		
+		try {
+			fw = new FileWriter(cible+"/"+getNom()+".xml", true);
+			BufferedWriter output = new BufferedWriter(fw);
+			output.write("<Terrain>\n");
+					output.write("\t<Name>"+getNom()+"</Name>\n");
+					output.write("\t<Passabilite>"+passabilite+"</Passabilite>\n");
+					output.write("\t<Infranchissable>"+infranchissable+"</Infranchissable>\n");
+					output.write("\t<Pheromones>\n");
+				for(int i = 0; i < pheromones.size(); i++)
+				{
+						output.write("\t\t<Phero>\n");
+							if(pheromones.get(i) != null)
+							{
+								output.write("\t\t\t<Nom>"+pheromones.get(i).getNom()+"</Nom>\n");
+								output.write("\t\t\t<Val1>"+pheroInitiales.get(i)+"</Val1>\n");
+								output.write("\t\t\t<Val2>"+pheroCroissance.get(i)+"</Val2>\n");
+							}
+							
+						output.write("\t\t</Phero>\n");
+				}
+					output.write("\t</Pheromones>\n");
+					output.write("\t<Couleur>\n");
+						output.write("\t\t<R>"+couleur.getRed()+"</R>\n");
+						output.write("\t\t<G>"+couleur.getGreen()+"</G>\n");
+						output.write("\t\t<B>"+couleur.getBlue()+"</B>\n");
+					output.write("\t</Couleur>\n");
+			output.write("</Terrain>");
+			output.flush();
+			output.close();
+			System.out.println("fichier créé");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+		
+		
 	}
 	
 	public int getPheromoneIndexByName(String s){

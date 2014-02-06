@@ -29,7 +29,7 @@ public class A_AddCogniton extends Action{
 	
 	@Override
 	public int getNumberActionSlot(){
-		return 2;
+		return 0;
 	}
 	
 	@Override

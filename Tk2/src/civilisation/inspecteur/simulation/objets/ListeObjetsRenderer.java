@@ -25,7 +25,7 @@ public class ListeObjetsRenderer  extends DefaultListCellRenderer{
 	        
 	       Objet o = (Objet) value;
 
-	       this.setText(o.getNom());
+	       this.setText(o.getName());
 	      // this.setBackground(((Terrain) value).getCouleur());
            
    			setIcon(o.getIcone());

@@ -12,7 +12,7 @@ public class A_GetItem extends Action{
 	@Override
 	public Action effectuer(Humain h) {
 
-		System.out.println(obj.getNom()); //TODO
+		System.out.println(obj.getName()); //TODO
 		return nextAction;
 	}
 
@@ -32,8 +32,8 @@ public class A_GetItem extends Action{
 	
 
 	/**
-	 * Retourne la structure des paramtres.
-	 * Permet de dterminer la prsentation de la fentre de rglages.
+	 * Retourne la structure des paramï¿½tres.
+	 * Permet de dÅ½terminer la prÅ½sentation de la fenï¿½tre de rÅ½glages.
 	 */
 	@Override
 	public ArrayList<String[]> getSchemaParametres(){

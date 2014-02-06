@@ -1,0 +1,12 @@
+<Terrain>
+	<Name>Montagne</Name>
+	<Passabilite>35</Passabilite>
+	<Infranchissable>false</Infranchissable>
+	<Pheromones>
+	</Pheromones>
+	<Couleur>
+		<R>153</R>
+		<G>102</G>
+		<B>0</B>
+	</Couleur>
+</Terrain>

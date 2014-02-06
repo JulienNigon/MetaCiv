@@ -1,0 +1,9 @@
+<Civilisation>
+	<Nom>Default_Civ_0</Nom>
+	<Agent>1</Agent>
+	<Couleur>
+		<R>255</R>
+		<G>251</G>
+		<B>251</B>
+	</Couleur>
+</Civilisation>
