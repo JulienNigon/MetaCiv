@@ -23,6 +23,7 @@ import civilisation.annotations.*;
 public class Configuration {
 
 	
+	
 	/*Attributes*/
 	public static ArrayList<String> attributesNames;
 	public static ArrayList<Integer> attributesStartingValues;
@@ -85,7 +86,8 @@ public class Configuration {
 	@ParametrisationDouble(min=0.1, max=3.0, pas = 0.1)
 	public static Double facteurApparitionDeNouveauxTraits = 1.0;
 	
-	
+	@ParametrisationInteger(min=1, max=200, toolTip = "Nombre de ticks de vision de l'agent.")
+	public static final int VisionRadius = 10;
 	
 	/*Tableau des traits disponibles � la naissance*/
 	public static String traitsDisponibles[] = {

@@ -1413,6 +1413,11 @@ public class Humain extends Turtle
 		attributes.put(s, d);
 	}
 
+	public ArrayList<Patch> getChemin() {
+		// TODO Auto-generated method stub
+		return this.chemin;
+	}
+}
 
 
 
