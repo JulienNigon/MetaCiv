@@ -705,4 +705,9 @@ public class Turtle extends AbstractAgent implements ReferenceableAgent
 		currentBehaviorCount++;
 		
 	}
+
+	public Patch getPatch() {
+		// TODO Auto-generated method stub
+		return this.position;
+	}
 }

@@ -25,8 +25,8 @@ import civilisation.individu.Humain;
 import civilisation.urbanisme.Batiment;
 import civilisation.urbanisme.Batiment_Grenier;
 import civilisation.world.World;
-
 import edu.turtlekit2.kernel.agents.Turtle;
+import edu.turtlekit2.kernel.environment.Patch;
 
 
 /** 
@@ -182,7 +182,10 @@ public class Communaute extends Turtle
 		}
 	
 		
-		
+		public Patch getPatch()
+		{
+			return this.position;
+		}
 }
 
 

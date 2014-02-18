@@ -77,6 +77,7 @@ public class Humain extends Turtle
 	String projet; //M≈Ωmorise le projet que souhaite accomplir l'agent
 	Boolean commit; //Indique si ce projet engage l'agent (il ne l'abandonne pas aprÔøΩs avoir effectu≈Ω un r≈Ωflexe par exemple)
 	int timer; //Si le projet de l'agent a une dur≈Ωe maximum dans le temps : -1 indique que non
+	Patch cible;
 	
 	ArrayList<Patch> chemin;
 	int tempsPatch;
@@ -1416,6 +1417,21 @@ public class Humain extends Turtle
 	public ArrayList<Patch> getChemin() {
 		// TODO Auto-generated method stub
 		return this.chemin;
+	}
+	
+	public Patch getCible()
+	{
+		return cible;
+	}
+	
+	public void setCible(Patch cible)
+	{
+		this.cible = cible;
+	}
+	
+	public Patch getPatch()
+	{
+		return this.position;
 	}
 }
 
